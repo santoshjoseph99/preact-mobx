@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1044,6 +1044,63 @@ var preact = {
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var createHelpers = __webpack_require__(4)
+var toInlineStyle = __webpack_require__(5)
+var parse = __webpack_require__(7)
+var classNames = __webpack_require__(9)
+var ref = __webpack_require__(0);
+var h = ref.h;
+
+exports.createComponent = createComponent
+exports.createElement = createElement
+
+var helpers = createHelpers(createElement)
+
+Object.keys(helpers).forEach(function (name) {
+  module.exports[name] = helpers[name]
+})
+
+function createElement () {
+  var ref = parse(arguments);
+  var node = ref.node;
+  var attrs = ref.attrs;
+  var children = ref.children;
+
+  for (var key in attrs) {
+    attrs[key] = decorate(attrs[key], key)
+  }
+
+  return h(node, attrs, children)
+}
+
+function decorate (val, name) {
+  switch (name) {
+    case 'class':
+      return classNames(val)
+    case 'style':
+      return typeof val !== 'string'
+        ? toInlineStyle(val)
+        : val
+    default:
+      return val
+  }
+}
+
+function createComponent (Component) {
+  return function () {
+    var args = [], len = arguments.length;
+    while ( len-- ) args[ len ] = arguments[ len ];
+
+    return createElement.apply(void 0, [ Component ].concat( args ));
+  }
+}
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4615,43 +4672,18 @@ if (typeof __MOBX_DEVTOOLS_GLOBAL_HOOK__ === "object") {
 
 /* harmony default export */ __webpack_exports__["default"] = (everything);
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(10)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(11)))
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-const { createElement, div, button, input } = __webpack_require__(3);
+const { createElement } = __webpack_require__(1);
 const { render, Component } = __webpack_require__(0);
-const {extendObservable} = __webpack_require__(1);
-const {observer} = __webpack_require__(11);
 const h = createElement;
-
-class CountStore {
-  constructor() {
-    extendObservable(this, {
-      count: 0
-    })
-  }
-}
-
-const CountUi = observer(class CountUi extends Component {
-  handleInc() {
-    this.props.store.count++;
-  }
-  handleDec() {
-    this.props.store.count--;
-  }
-  render() {
-    let store = this.props.store;
-    return div([
-      button({ onClick: () => this.handleInc()}, '+'),
-      button({ onClick: function () { store.count--; } }, '-'),
-      input({ type: 'text', readonly: true, value: store.count }),
-    ]);
-  }
-});
+const CountStore = __webpack_require__(10);
+const CountUi = __webpack_require__(12);
 
 const countStore = new CountStore();
 
@@ -4659,63 +4691,6 @@ render(
   h(CountUi, {store: countStore}),
   document.getElementById('app')
 );
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-
-var createHelpers = __webpack_require__(4)
-var toInlineStyle = __webpack_require__(5)
-var parse = __webpack_require__(7)
-var classNames = __webpack_require__(9)
-var ref = __webpack_require__(0);
-var h = ref.h;
-
-exports.createComponent = createComponent
-exports.createElement = createElement
-
-var helpers = createHelpers(createElement)
-
-Object.keys(helpers).forEach(function (name) {
-  module.exports[name] = helpers[name]
-})
-
-function createElement () {
-  var ref = parse(arguments);
-  var node = ref.node;
-  var attrs = ref.attrs;
-  var children = ref.children;
-
-  for (var key in attrs) {
-    attrs[key] = decorate(attrs[key], key)
-  }
-
-  return h(node, attrs, children)
-}
-
-function decorate (val, name) {
-  switch (name) {
-    case 'class':
-      return classNames(val)
-    case 'style':
-      return typeof val !== 'string'
-        ? toInlineStyle(val)
-        : val
-    default:
-      return val
-  }
-}
-
-function createComponent (Component) {
-  return function () {
-    var args = [], len = arguments.length;
-    while ( len-- ) args[ len ] = arguments[ len ];
-
-    return createElement.apply(void 0, [ Component ].concat( args ));
-  }
-}
-
 
 /***/ }),
 /* 4 */
@@ -4971,6 +4946,28 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 /***/ }),
 /* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const {extendObservable} = __webpack_require__(2);
+
+class CountStore {
+  constructor() {
+    extendObservable(this, {
+      count: 0
+    })
+  }
+  incCount() {
+    this.count++;
+  }
+  decCount() {
+    this.count--;
+  }
+}
+
+module.exports = CountStore;
+
+/***/ }),
+/* 11 */
 /***/ (function(module, exports) {
 
 var g;
@@ -4997,7 +4994,35 @@ module.exports = g;
 
 
 /***/ }),
-/* 11 */
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+const { createElement, div, button, input } = __webpack_require__(1);
+const { Component } = __webpack_require__(0);
+const {observer} = __webpack_require__(13);
+
+const CountUi = observer(class CountUi extends Component {
+  handleInc() {
+    this.props.store.incCount();
+  }
+  handleDec() {
+    this.props.store.decCount();
+  }
+  render() {
+    let store = this.props.store;
+    return div([
+      button('#inc', { onClick: () => this.handleInc() }, '+'),
+      button('#dec', { onClick: () => this.handleDec() }, '-'),
+      input({ type: 'text', readonly: true, value: store.count }),
+    ]);
+  }
+});
+
+module.exports = CountUi;
+
+/***/ }),
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5013,7 +5038,7 @@ exports.observer = observer;
 exports.setComponent = setComponent;
 exports.makeObserver = makeObserver;
 
-var _mobx = __webpack_require__(1);
+var _mobx = __webpack_require__(2);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
