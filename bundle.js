@@ -4948,12 +4948,15 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 /* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-const {extendObservable} = __webpack_require__(2);
+const {extendObservable, computed} = __webpack_require__(2);
 
 class CountStore {
   constructor() {
     extendObservable(this, {
-      count: 0
+      count: 0,
+      high: computed(() => {
+        return this.count > 5;
+      })
     })
   }
   incCount() {
@@ -5011,10 +5014,15 @@ const CountUi = observer(class CountUi extends Component {
   }
   render() {
     let store = this.props.store;
+    let message = div('.hide-msg', 'Message is > 5!');
+    if(store.high) {
+      message = div('.show-msg', 'Message is > 5!');
+    }
     return div([
       button('#inc', { onClick: () => this.handleInc() }, '+'),
       button('#dec', { onClick: () => this.handleDec() }, '-'),
       input({ type: 'text', readonly: true, value: store.count }),
+      message
     ]);
   }
 });

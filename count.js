@@ -12,10 +12,15 @@ const CountUi = observer(class CountUi extends Component {
   }
   render() {
     let store = this.props.store;
+    let message = div('.hide-msg', 'Message is > 5!');
+    if(store.highCount) {
+      message = div('.show-msg', 'Message is > 5!');
+    }
     return div([
       button('#inc', { onClick: () => this.handleInc() }, '+'),
       button('#dec', { onClick: () => this.handleDec() }, '-'),
       input({ type: 'text', readonly: true, value: store.count }),
+      message
     ]);
   }
 });

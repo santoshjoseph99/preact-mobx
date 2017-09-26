@@ -1,9 +1,12 @@
-const {extendObservable} = require('mobx');
+const {extendObservable, computed} = require('mobx');
 
 class CountStore {
   constructor() {
     extendObservable(this, {
-      count: 0
+      count: 0,
+      highCount: computed(() => {
+        return this.count > 5;
+      })
     })
   }
   incCount() {
