@@ -4692,6 +4692,19 @@ render(
   document.getElementById('app')
 );
 
+setInterval(decEvent, 500);
+setInterval(incEvent, 100);
+
+function decEvent() {
+  let event = new MouseEvent('click');
+  document.getElementById('dec').dispatchEvent(event);
+}
+
+function incEvent() {
+  let event = new MouseEvent('click');
+  document.getElementById('inc').dispatchEvent(event);
+}
+
 /***/ }),
 /* 4 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -4954,7 +4967,7 @@ class CountStore {
   constructor() {
     extendObservable(this, {
       count: 0,
-      high: computed(() => {
+      highCount: computed(() => {
         return this.count > 5;
       })
     })
@@ -5007,15 +5020,15 @@ const {observer} = __webpack_require__(13);
 
 const CountUi = observer(class CountUi extends Component {
   handleInc() {
-    this.props.store.incCount();
+    setTimeout(() => this.props.store.incCount(), 1000);
   }
   handleDec() {
-    this.props.store.decCount();
+    setTimeout(() => this.props.store.decCount(), 3000);
   }
   render() {
     let store = this.props.store;
     let message = div('.hide-msg', 'Message is > 5!');
-    if(store.high) {
+    if(store.highCount) {
       message = div('.show-msg', 'Message is > 5!');
     }
     return div([

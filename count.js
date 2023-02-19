@@ -2,20 +2,20 @@
 const { createElement, div, button, input } = require('preact-hyperscript');
 const { Component } = require('preact');
 const {observer} = require('mobx-observer');
+const {action} = require('mobx');
 
 const CountUi = observer(class CountUi extends Component {
+  //add @action attribute
   handleInc() {
-    this.props.store.incCount();
+    setTimeout(() => this.props.store.incCount(), 1000);
   }
   handleDec() {
-    this.props.store.decCount();
+    setTimeout(() => this.props.store.decCount(), 3000);
   }
   render() {
     let store = this.props.store;
-    let message = div('.hide-msg', 'Message is > 5!');
-    if(store.highCount) {
-      message = div('.show-msg', 'Message is > 5!');
-    }
+    let msgClass = store.highCount ? '.show-msg' : '.hide-msg';
+    let message = div(msgClass, 'Message is > 5!');
     return div([
       button('#inc', { onClick: () => this.handleInc() }, '+'),
       button('#dec', { onClick: () => this.handleDec() }, '-'),
